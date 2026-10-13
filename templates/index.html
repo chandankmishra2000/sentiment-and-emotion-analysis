@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Emotion Intelligence Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-700 p-2.5 rounded-xl shadow-inner text-indigo-200">
+                    <i class="fa-solid fa-brain text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">EmotiLens AI</h1>
+                    <p class="text-xs text-indigo-300">NLP Emotion Classifier & Analytics Suite</p>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#predictor" class="hover:text-indigo-300 transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Live Predictor</a>
+                <a href="#analytics" class="hover:text-indigo-300 transition"><i class="fa-solid fa-chart-pie mr-1"></i> Data Analytics</a>
+                <a href="#models" class="hover:text-indigo-300 transition"><i class="fa-solid fa-microchip mr-1"></i> ML Models</a>
+                <a href="#dataset" class="hover:text-indigo-300 transition"><i class="fa-solid fa-table mr-1"></i> Dataset Viewer</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white py-16 px-4 text-center shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#e0e7ff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-4xl mx-auto relative z-10">
+            <span class="bg-indigo-700/80 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block shadow">Powered by Scikit-Learn & Flask</span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4">Discover the Emotional Tone of Any Text</h2>
+            <p class="text-lg text-indigo-200 mb-8 max-w-2xl mx-auto">Trained on {{ total_samples }}+ samples with Advanced TF-IDF Vectorization and Support Vector Machines (SVM) delivering ~89% accuracy.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#predictor" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5 flex items-center">
+                    <i class="fa-solid fa-bolt mr-2"></i> Try Live Predictor
+                </a>
+                <a href="#analytics" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl backdrop-blur border border-white/20 transition flex items-center">
+                    <i class="fa-solid fa-chart-line mr-2"></i> View Data insights
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 flex-grow w-full">
+        
+        <!-- Live Predictor Card -->
+        <section id="predictor" class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-10 transition hover:shadow-2xl">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900">Interactive Emotion Classifier</h3>
+                    <p class="text-slate-500 text-sm mt-1">Type or paste any sentence below to analyze its underlying emotion instantly.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <textarea id="inputText" rows="4" class="w-full rounded-xl border border-slate-300 p-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-slate-700 placeholder-slate-400 text-base shadow-inner" placeholder="e.g., I am feeling exceptionally thrilled about the amazing project launch today!"></textarea>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-2 text-xs text-slate-400">
+                            <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                            <span>Model: Linear SVM (TF-IDF Pipeline)</span>
+                        </div>
+                        <button onclick="predictEmotion()" id="predictBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-xl shadow-md transition flex items-center justify-center min-w-[150px]">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Classify Emotion
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prediction Results Box -->
+                <div id="resultBox" class="hidden mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200 animate-fade-in">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-200 pb-4">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Detected Emotion</span>
+                            <h4 id="detectedEmotion" class="text-3xl font-extrabold text-indigo-600 capitalize mt-0.5">Joy</h4>
+                        </div>
+                        <div id="emotionIcon" class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl shadow-inner">
+                            <i class="fa-solid fa-face-laugh-beam"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Confidence Breakdown</h5>
+                        <div id="confidenceBars" class="space-y-2.5">
+                            <!-- Bars populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analytics" class="space-y-8">
+            <div class="text-center max-w-xl mx-auto">
+                <h3 class="text-2xl font-bold text-slate-900">Exploratory Data Analysis</h3>
+                <p class="text-slate-500 text-sm mt-1">Visual insights generated directly from the training dataframe.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Plot 1 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex flex-col items-center justify-center">
+                    <h4 class="font-semibold text-slate-700 mb-4 text-center">Emotion Class Distribution</h4>
+                    {% if plot1 %}
+                        <img src="data:image/png;base64,{{ plot1 }}" alt="Emotion Distribution" class="rounded-xl w-full max-h-[350px] object-contain">
+                    {% else %}
+                        <p class="text-slate-400 text-sm">Plot generating...</p>
+                    {% endif %}
+                </div>
+                <!-- Plot 2 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex flex-col items-center justify-center">
+                    <h4 class="font-semibold text-slate-700 mb-4 text-center">Algorithm Accuracy Comparison</h4>
+                    {% if plot2 %}
+                        <img src="data:image/png;base64,{{ plot2 }}" alt="Model Comparison" class="rounded-xl w-full max-h-[350px] object-contain">
+                    {% else %}
+                        <p class="text-slate-400 text-sm">Plot generating...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <h3 class="text-2xl font-bold text-slate-900">Trained Model Performance</h3>
+                <p class="text-slate-500 text-sm mt-1">Comparison of tested classifiers on test split.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for name, acc in metrics.items() %}
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex flex-col justify-between transition hover:-translate-y-1">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl text-lg font-bold"><i class="fa-solid fa-code-branch"></i></span>
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full">Tested</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-800">{{ name }}</h4>
+                        <p class="text-xs text-slate-500 mt-1">Evaluated using Precision, Recall, and F1-Score metrics on TF-IDF features.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-medium uppercase">Accuracy Score</span>
+                        <span class="text-2xl font-extrabold text-indigo-600">{{ acc }}%</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="dataset" class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">Training Dataset Explorer</h3>
+                    <p class="text-slate-500 text-sm mt-0.5">Showing preview samples from <code class="bg-slate-100 px-2 py-0.5 rounded text-indigo-600 font-mono text-xs">train.txt</code>.</p>
+                </div>
+                <span class="bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-xl">Total Records: {{ total_samples }}</span>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="p-4">#</th>
+                            <th class="p-4">Text Sample</th>
+                            <th class="p-4">Emotion Label</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-600">
+                        {% for row in samples %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="p-4 font-mono text-xs text-slate-400">{{ loop.index }}</td>
+                            <td class="p-4 font-medium text-slate-800">{{ row.text }}</td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
+                                    {% if row.emotion_name == 'joy' %} bg-emerald-100 text-emerald-700
+                                    {% elif row.emotion_name == 'sadness' %} bg-blue-100 text-blue-700
+                                    {% elif row.emotion_name == 'anger' %} bg-rose-100 text-rose-700
+                                    {% elif row.emotion_name == 'fear' %} bg-purple-100 text-purple-700
+                                    {% elif row.emotion_name == 'love' %} bg-pink-100 text-pink-700
+                                    {% else %} bg-amber-100 text-amber-700 {% endif %}">
+                                    {{ row.emotion_name }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-10 mt-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <span class="text-white font-bold text-base tracking-tight">EmotiLens AI Web App</span>
+            </div>
+            <p class="text-xs text-slate-500">Built with Flask, Pandas, Scikit-Learn, and Tailwind CSS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const emotionIcons = {
+            'JOY': 'fa-face-laugh-beam',
+            'SADNESS': 'fa-face-sad-cry',
+            'ANGER': 'fa-face-angry',
+            'FEAR': 'fa-face-flushed',
+            'LOVE': 'fa-face-grin-hearts',
+            'SURPRISE': 'fa-face-surprise'
+        };
+
+        const emotionColors = {
+            'JOY': 'bg-emerald-500',
+            'SADNESS': 'bg-blue-500',
+            'ANGER': 'bg-rose-500',
+            'FEAR': 'bg-purple-500',
+            'LOVE': 'bg-pink-500',
+            'SURPRISE': 'bg-amber-500'
+        };
+
+        async function predictEmotion() {
+            const text = document.getElementById('inputText').value.trim();
+            const btn = document.getElementById('predictBtn');
+            const resultBox = document.getElementById('resultBox');
+            
+            if (!text) {
+                alert('Please enter some text to classify.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Analyzing...';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('detectedEmotion').innerText = data.emotion;
+                    
+                    const iconClass = emotionIcons[data.emotion] || 'fa-face-smile';
+                    document.getElementById('emotionIcon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+                    const barsContainer = document.getElementById('confidenceBars');
+                    barsContainer.innerHTML = '';
+
+                    for (const [emo, score] of Object.entries(data.scores)) {
+                        const pct = Math.round(score * 100);
+                        const colorClass = emotionColors[emo.toUpperCase()] || 'bg-indigo-500';
+                        
+                        const barHtml = `
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span class="capitalize">${emo}</span>
+                                    <span>${pct}%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                                    <div class="${colorClass} h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        `;
+                        barsContainer.innerHTML += barHtml;
+                    }
+
+                    resultBox.classList.remove('hidden');
+                } else {
+                    alert(data.error || 'Prediction failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred connecting to the Flask server.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Classify Emotion';
+            }
+        }
+    </script>
+</body>
+</html>
